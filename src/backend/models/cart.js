@@ -96,6 +96,16 @@ class Order {
     async getUser() {
         return User.findById(this.discordId);
     }
+
+    async calculateTotalPrice() {
+        try {
+            const products = await this.getProducts();
+            const totalPrice = products.reduce((total, product) => total + parseFloat(product.price), 0);
+            return totalPrice.toFixed(2);
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = Order;

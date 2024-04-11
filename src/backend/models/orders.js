@@ -77,6 +77,15 @@ class Order {
                 .catch((err) => reject(err));
         });
     }
+
+    async calculateOrderPrice() {
+        try {
+            const products = await this.getProducts();
+            return products.reduce((acc, product) => acc + parseInt(product.price), 0);
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = Order;
