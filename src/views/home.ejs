@@ -4,5 +4,7 @@
         <%- include('./partials/_header') %>
     </head>
 
-    <body></body>
+    <body>
+        <%= req.isAuthenticated() %> <%= req.user.username %>
+    </body>
 </html>

@@ -10,6 +10,10 @@ const productsRoutes = require('./pages/products');
 const cartRoutes = require('./pages/cart');
 const adminRoutes = require('./pages/admin');
 
+// middlewares
+const isAdmin = require('./middleware/isAdmin');
+const checkAuth = require('./middleware/checkAuth');
+
 app.set('view engine', 'ejs');
 app.set('views', './src/views');
 
@@ -31,8 +35,8 @@ app.use('/auth', authRoutes);
 
 app.use('/', homeRoutes);
 app.use('/products', productsRoutes);
-app.use('/cart', cartRoutes);
-app.use('/admin', adminRoutes);
+app.use('/cart', checkAuth, cartRoutes);
+app.use('/admin', isAdmin, adminRoutes);
 
 app.use((err, req, res, next) => {
     console.error(err.stack);

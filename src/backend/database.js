@@ -13,48 +13,70 @@ const tables = {
     PRODUCT: 'product',
     CART: 'cart',
     ORDER: 'order',
+    CART_ITEMS: 'cart_items',
 };
 
-const queries = [
-    `CREATE TABLE IF NOT EXISTS \`${tables.USER}\` (
-        discord_id VARCHAR(255) PRIMARY KEY,
-        username VARCHAR(255),
-        email VARCHAR(255),
-        avatar VARCHAR(255),
-        blacklist BOOLEAN
-    )`,
-    `CREATE TABLE IF NOT EXISTS \`${tables.PRODUCT}\` (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(255),
-        images VARCHAR(255),
-        description VARCHAR(255),
-        price VARCHAR(255)
-    )`,
-    `CREATE TABLE IF NOT EXISTS \`${tables.CART}\` (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        discord_id VARCHAR(255),
-        product_id INT,
-        FOREIGN KEY (discord_id) REFERENCES \`${tables.USER}\`(discord_id),
-        FOREIGN KEY (product_id) REFERENCES \`${tables.PRODUCT}\`(id)
-    )`,
-    `CREATE TABLE IF NOT EXISTS \`${tables.ORDER}\` (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        discord_id VARCHAR(255),
-        product_id INT,
-        FOREIGN KEY (discord_id) REFERENCES \`${tables.USER}\`(discord_id),
-        FOREIGN KEY (product_id) REFERENCES \`${tables.PRODUCT}\`(id)
-    )`,
-];
-
-queries.forEach((query) => {
-    connection.query(query, (err, results) => {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log(`Database | ${query.split(' ')[5]} table is created!`);
-        }
+const createTable = (query) => {
+    return new Promise((resolve, reject) => {
+        connection.query(query, (err, results) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(results);
+            }
+        });
     });
-});
+};
+
+const createTablesSequentially = async () => {
+    try {
+        await createTable(`CREATE TABLE IF NOT EXISTS \`${tables.USER}\` (
+            discord_id VARCHAR(255) PRIMARY KEY,
+            username VARCHAR(255),
+            email VARCHAR(255),
+            avatar VARCHAR(255),
+            blacklist BOOLEAN DEFAULT FALSE,
+            permission INT
+        )`);
+
+        await createTable(`CREATE TABLE IF NOT EXISTS \`${tables.PRODUCT}\` (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255),
+            images VARCHAR(255),
+            description VARCHAR(255),
+            price VARCHAR(255)
+        )`);
+
+        await createTable(`CREATE TABLE IF NOT EXISTS \`cart\` (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            discord_id VARCHAR(255) UNIQUE,
+            FOREIGN KEY (discord_id) REFERENCES \`user\`(discord_id)
+        )
+        `);
+
+        await createTable(`CREATE TABLE IF NOT EXISTS \`${tables.ORDER}\` (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            discord_id VARCHAR(255),
+            product_id INT,
+            FOREIGN KEY (discord_id) REFERENCES \`${tables.USER}\`(discord_id),
+            FOREIGN KEY (product_id) REFERENCES \`${tables.PRODUCT}\`(id)
+        )`);
+
+        await createTable(`CREATE TABLE IF NOT EXISTS \`${tables.CART_ITEMS}\` (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            cart_id INT,
+            product_id INT,
+            FOREIGN KEY (cart_id) REFERENCES \`${tables.CART}\`(id),
+            FOREIGN KEY (product_id) REFERENCES \`${tables.PRODUCT}\`(id)
+        )`);
+
+        console.log('All tables are created successfully.');
+    } catch (error) {
+        console.error('Error creating tables:', error);
+    }
+};
+
+createTablesSequentially();
 
 module.exports = connection;
 module.exports.tables = tables;

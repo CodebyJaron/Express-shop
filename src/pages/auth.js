@@ -21,7 +21,9 @@ passport.use(
             scope: ['identify', 'email'],
         },
         (accessToken, refreshToken, profile, done) => {
-            User.updateOrCreate(profile.id, profile.username, profile.email).then((user) => done(null, user));
+            User.updateOrCreate(profile.id, profile.username, profile.email, profile.avatar, 0).then((user) =>
+                done(null, user)
+            );
         }
     )
 );
@@ -43,7 +45,12 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((user, done) => {
-    User.updateOrCreate(user.id, user.username, user.email).then((user) => done(null, user));
+    User.updateOrCreate(user.discordId, user.username, user.email, user.avatar, user.permission || 0)
+        .then((user) => done(null, user))
+        .catch((err) => {
+            console.error(err);
+            done(err);
+        });
 });
 
 router.get('/profile', authMiddleware, (req, res) => {
