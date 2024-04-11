@@ -9,5 +9,6 @@
         "client_id": "1172630896541708479",
         "client_secret": "pLQMhvMzhoOt7Nvt3yWtJzoDx6cwHjIR",
         "redirect_uri": "http://localhost:3000/auth/discord/callback"
-    }
+    },
+    "stripeSecret": ""
 }
