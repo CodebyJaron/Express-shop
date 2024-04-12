@@ -65,6 +65,7 @@ const createTablesSequentially = async () => {
         await createTable(`CREATE TABLE IF NOT EXISTS \`${tables.ORDER}\` (
             id INT AUTO_INCREMENT PRIMARY KEY,
             discord_id VARCHAR(255),
+            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (discord_id) REFERENCES \`${tables.USER}\`(discord_id)
         )`);
 

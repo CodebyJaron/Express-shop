@@ -1,12 +1,8 @@
-const db = require('../database');
-const tables = db.tables;
-const Product = require('./product');
-const User = require('./user');
-
 class Order {
-    constructor(id, discordId) {
+    constructor(id, discordId, date) {
         this.id = id;
         this.discordId = discordId;
+        this.date = date;
         this.products = [];
     }
 
@@ -16,7 +12,7 @@ class Order {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(rows.map((row) => new Order(row.id, row.discord_id)));
+                    resolve(rows.map((row) => new Order(row.id, row.discord_id, row.date)));
                 }
             });
         });
@@ -29,7 +25,7 @@ class Order {
                     reject(err || new Error('Order not found'));
                 } else {
                     const row = rows[0];
-                    resolve(new Order(row.id, row.discord_id));
+                    resolve(new Order(row.id, row.discord_id, row.date));
                 }
             });
         });
@@ -41,7 +37,7 @@ class Order {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(rows.map((row) => new Order(row.id, row.discord_id)));
+                    resolve(rows.map((row) => new Order(row.id, row.discord_id, row.date)));
                 }
             });
         });
@@ -91,7 +87,11 @@ class Order {
     }
 
     async getUser() {
-        return User.findById(this.discordId);
+        return new Promise((resolve, reject) => {
+            User.findById(this.discordId)
+                .then((user) => resolve(user))
+                .catch((err) => reject(err));
+        });
     }
 
     async calculateOrderPrice() {
