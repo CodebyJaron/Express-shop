@@ -3,12 +3,11 @@ const tables = db.tables;
 const Product = require('./product');
 const User = require('./user');
 
-// order(null, discordId, [productids])
 class Order {
-    constructor(id, discordId, productIds) {
+    constructor(id, discordId) {
         this.id = id;
         this.discordId = discordId;
-        this.productIds = productIds;
+        this.products = [];
     }
 
     static async getAll() {
@@ -17,7 +16,7 @@ class Order {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(rows.map((row) => new Order(row.id, row.discord_id, JSON.parse(row.product_ids))));
+                    resolve(rows.map((row) => new Order(row.id, row.discord_id)));
                 }
             });
         });
@@ -30,7 +29,19 @@ class Order {
                     reject(err || new Error('Order not found'));
                 } else {
                     const row = rows[0];
-                    resolve(new Order(row.id, row.discord_id, JSON.parse(row.product_ids)));
+                    resolve(new Order(row.id, row.discord_id));
+                }
+            });
+        });
+    }
+
+    static async findByUserId(userId) {
+        return new Promise((resolve, reject) => {
+            db.query(`SELECT * FROM ${tables.ORDER} WHERE discord_id = ?`, [userId], (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows.map((row) => new Order(row.id, row.discord_id)));
                 }
             });
         });
@@ -38,18 +49,14 @@ class Order {
 
     async create() {
         return new Promise((resolve, reject) => {
-            db.query(
-                `INSERT INTO ${tables.ORDER} (discord_id, product_ids) VALUES (?, ?)`,
-                [this.discordId, JSON.stringify(this.productIds)],
-                (err, result) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        this.id = result.insertId;
-                        resolve(this);
-                    }
+            db.query(`INSERT INTO ${tables.ORDER} (discord_id) VALUES (?)`, [this.discordId], (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    this.id = result.insertId;
+                    resolve(this);
                 }
-            );
+            });
         });
     }
 
@@ -66,16 +73,25 @@ class Order {
     }
 
     async getProducts() {
-        const productPromises = this.productIds.map((productId) => Product.findById(productId));
-        return Promise.all(productPromises);
+        return new Promise((resolve, reject) => {
+            db.query(
+                `SELECT product_id FROM ${tables.ORDER_PRODUCTS} WHERE order_id = ?`,
+                [this.id],
+                async (err, rows) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        const productIds = rows.map((row) => row.product_id);
+                        const products = await Promise.all(productIds.map((productId) => Product.findById(productId)));
+                        resolve(products);
+                    }
+                }
+            );
+        });
     }
 
     async getUser() {
-        return new Promise((resolve, reject) => {
-            User.findById(this.discordId)
-                .then((user) => resolve(user))
-                .catch((err) => reject(err));
-        });
+        return User.findById(this.discordId);
     }
 
     async calculateOrderPrice() {

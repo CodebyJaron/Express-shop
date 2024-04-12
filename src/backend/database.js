@@ -14,6 +14,7 @@ const tables = {
     CART: 'cart',
     ORDER: 'order',
     CART_ITEMS: 'cart_items',
+    ORDER_PRODUCTS: 'order_products',
 };
 
 const createTable = (query) => {
@@ -47,26 +48,31 @@ const createTablesSequentially = async () => {
             price VARCHAR(255)
         )`);
 
-        await createTable(`CREATE TABLE IF NOT EXISTS \`cart\` (
+        await createTable(`CREATE TABLE IF NOT EXISTS ${tables.CART} (
             id INT AUTO_INCREMENT PRIMARY KEY,
             discord_id VARCHAR(255) UNIQUE,
-            FOREIGN KEY (discord_id) REFERENCES \`user\`(discord_id)
-        )
-        `);
+            FOREIGN KEY (discord_id) REFERENCES ${tables.USER}(discord_id)
+        )`);
+
+        await createTable(`CREATE TABLE IF NOT EXISTS ${tables.CART_ITEMS} (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            cart_id INT,
+            product_id INT,
+            FOREIGN KEY (cart_id) REFERENCES ${tables.CART}(id),
+            FOREIGN KEY (product_id) REFERENCES ${tables.PRODUCT}(id)
+        )`);
 
         await createTable(`CREATE TABLE IF NOT EXISTS \`${tables.ORDER}\` (
             id INT AUTO_INCREMENT PRIMARY KEY,
             discord_id VARCHAR(255),
-            product_id INT,
-            FOREIGN KEY (discord_id) REFERENCES \`${tables.USER}\`(discord_id),
-            FOREIGN KEY (product_id) REFERENCES \`${tables.PRODUCT}\`(id)
+            FOREIGN KEY (discord_id) REFERENCES \`${tables.USER}\`(discord_id)
         )`);
 
-        await createTable(`CREATE TABLE IF NOT EXISTS \`${tables.CART_ITEMS}\` (
+        await createTable(`CREATE TABLE IF NOT EXISTS \`${tables.ORDER_PRODUCTS}\` (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            cart_id INT,
+            order_id INT,
+            FOREIGN KEY (order_id) REFERENCES \`${tables.ORDER}\`(id),
             product_id INT,
-            FOREIGN KEY (cart_id) REFERENCES \`${tables.CART}\`(id),
             FOREIGN KEY (product_id) REFERENCES \`${tables.PRODUCT}\`(id)
         )`);
 

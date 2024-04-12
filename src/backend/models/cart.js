@@ -1,20 +1,18 @@
-// Order.js
-
 const db = require('../database');
 const tables = db.tables;
 const Product = require('./product');
 const User = require('./user');
 
-class Order {
+class Cart {
     constructor(id, discordId) {
         this.id = id;
         this.discordId = discordId;
         this.products = [];
     }
 
-    static async findByUserId(discordId) {
+    static async findByUserId(userId) {
         return new Promise((resolve, reject) => {
-            db.query(`SELECT * FROM ${tables.CART} WHERE discord_id = ?`, [discordId], (err, rows) => {
+            db.query(`SELECT * FROM ${tables.CART} WHERE discord_id = ?`, [userId], (err, rows) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -31,7 +29,7 @@ class Order {
 
     async create() {
         return new Promise((resolve, reject) => {
-            db.query(`INSERT INTO ${tables.ORDER} (discord_id) VALUES (?)`, [this.discordId], (err, result) => {
+            db.query(`INSERT INTO ${tables.CART} (discord_id) VALUES (?)`, [this.discordId], (err, result) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -42,10 +40,22 @@ class Order {
         });
     }
 
+    async delete() {
+        return new Promise((resolve, reject) => {
+            db.query(`DELETE FROM ${tables.CART} WHERE id = ?`, [this.id], (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
     async addProduct(productId) {
         return new Promise((resolve, reject) => {
             db.query(
-                `INSERT INTO ${tables.ORDER_ITEMS} (order_id, product_id) VALUES (?, ?)`,
+                `INSERT INTO ${tables.CART_ITEMS} (cart_id, product_id) VALUES (?, ?)`,
                 [this.id, productId],
                 (err, result) => {
                     if (err) {
@@ -61,7 +71,7 @@ class Order {
     async removeProduct(productId) {
         return new Promise((resolve, reject) => {
             db.query(
-                `DELETE FROM ${tables.ORDER_ITEMS} WHERE order_id = ? AND product_id = ?`,
+                `DELETE FROM ${tables.CART_ITEMS} WHERE cart_id = ? AND product_id = ?`,
                 [this.id, productId],
                 (err, result) => {
                     if (err) {
@@ -76,36 +86,21 @@ class Order {
 
     async getProducts() {
         return new Promise((resolve, reject) => {
-            db.query(
-                `SELECT * FROM ${tables.PRODUCT} WHERE id IN (SELECT product_id FROM ${tables.ORDER_ITEMS} WHERE order_id = ?)`,
-                [this.id],
-                (err, rows) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        const products = rows.map(
-                            (row) => new Product(row.id, row.name, row.images, row.description, row.price)
-                        );
-                        resolve(products);
-                    }
+            db.query(`SELECT product_id FROM ${tables.CART_ITEMS} WHERE cart_id = ?`, [this.id], async (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const productIds = rows.map((row) => row.product_id);
+                    const products = await Promise.all(productIds.map((productId) => Product.findById(productId)));
+                    resolve(products);
                 }
-            );
+            });
         });
     }
 
     async getUser() {
         return User.findById(this.discordId);
     }
-
-    async calculateTotalPrice() {
-        try {
-            const products = await this.getProducts();
-            const totalPrice = products.reduce((total, product) => total + parseFloat(product.price), 0);
-            return totalPrice.toFixed(2);
-        } catch (error) {
-            throw error;
-        }
-    }
 }
 
-module.exports = Order;
+module.exports = Cart;
