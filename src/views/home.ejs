@@ -5,6 +5,10 @@
     </head>
 
     <body>
-        <%= req.isAuthenticated() %> <%= req.user.username %>
+        <% if (req.isAuthenticated()) { %>
+        <h1>Welcome, <%= req.user.username %></h1>
+        <% } else { %>
+        <h1>Not logged in</h1>
+        <% } %>
     </body>
 </html>

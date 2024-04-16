@@ -37,7 +37,8 @@ const createTablesSequentially = async () => {
             email VARCHAR(255),
             avatar VARCHAR(255),
             blacklist BOOLEAN DEFAULT FALSE,
-            permission INT
+            permission INT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`);
 
         await createTable(`CREATE TABLE IF NOT EXISTS \`${tables.PRODUCT}\` (

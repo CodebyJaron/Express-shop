@@ -46,6 +46,20 @@ module.exports = class User {
         });
     }
 
+    static async getAllCreatedLast24Hours() {
+        return new Promise((resolve, reject) => {
+            db.query(`SELECT * FROM ${table} WHERE created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)`, (err, rows) => {
+                if (err) {
+                    reject(null);
+                } else {
+                    resolve(
+                        rows.map((row) => new User(row.discord_id, row.username, row.email, row.avatar, row.permission))
+                    );
+                }
+            });
+        });
+    }
+
     async create() {
         return new Promise((resolve, reject) => {
             db.query(

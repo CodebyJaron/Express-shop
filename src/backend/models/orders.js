@@ -1,3 +1,6 @@
+const db = require('../database');
+const tables = db.tables;
+
 class Order {
     constructor(id, discordId, date) {
         this.id = id;
@@ -34,6 +37,17 @@ class Order {
     static async findByUserId(userId) {
         return new Promise((resolve, reject) => {
             db.query(`SELECT * FROM ${tables.ORDER} WHERE discord_id = ?`, [userId], (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows.map((row) => new Order(row.id, row.discord_id, row.date)));
+                }
+            });
+        });
+    }
+    static async getAllInLast24Hours() {
+        return new Promise((resolve, reject) => {
+            db.query(`SELECT * FROM \`${tables.ORDER}\` WHERE date >= DATE_SUB(NOW(), INTERVAL 1 DAY)`, (err, rows) => {
                 if (err) {
                     reject(err);
                 } else {
