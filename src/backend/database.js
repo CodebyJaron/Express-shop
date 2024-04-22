@@ -15,6 +15,7 @@ const tables = {
     ORDER: 'order',
     CART_ITEMS: 'cart_items',
     ORDER_PRODUCTS: 'order_products',
+    CATEGORY: 'category',
 };
 
 const createTable = (query) => {
@@ -41,12 +42,19 @@ const createTablesSequentially = async () => {
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`);
 
+        await createTable(`CREATE TABLE IF NOT EXISTS \`${tables.CATEGORY}\` (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255)
+        )`);
+
         await createTable(`CREATE TABLE IF NOT EXISTS \`${tables.PRODUCT}\` (
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255),
             images VARCHAR(255),
             description VARCHAR(255),
-            price VARCHAR(255)
+            price VARCHAR(255),
+            category_id INT,
+            FOREIGN KEY (category_id) REFERENCES ${tables.CATEGORY}(id)
         )`);
 
         await createTable(`CREATE TABLE IF NOT EXISTS ${tables.CART} (

@@ -5,8 +5,9 @@ const Product = require('../backend/models/product');
 const isAdmin = require('../middleware/isAdmin');
 
 router.get('/', async (req, res) => {
-    res.render('products/list', {
+    res.render('products/products', {
         products: await Product.getAll(),
+        user: req.user ? req.user : null || null,
     });
 });
 
@@ -18,8 +19,8 @@ router.get('/create', isAdmin, async (req, res) => {
 
 router.post('/', isAdmin, async (req, res) => {
     try {
-        const { name, images, description, price } = req.body;
-        const product = new Product(null, name, images, description, price);
+        const { name, images, description, price, categoryId } = req.body;
+        const product = new Product(null, name, images, description, price, categoryId);
         await product.create();
         res.redirect('/products');
     } catch (error) {
@@ -30,8 +31,8 @@ router.post('/', isAdmin, async (req, res) => {
 router.put('/:id', isAdmin, async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, images, description, price } = req.body;
-        const product = new Product(id, name, images, description, price);
+        const { name, images, description, price, categoryId } = req.body;
+        const product = new Product(id, name, images, description, price, categoryId);
         await product.update();
         res.redirect('/products');
     } catch (error) {

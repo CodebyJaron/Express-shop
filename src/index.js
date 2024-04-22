@@ -9,6 +9,7 @@ const homeRoutes = require('./pages/home');
 const productsRoutes = require('./pages/products');
 const cartRoutes = require('./pages/cart');
 const adminRoutes = require('./pages/admin');
+const categoryRoutes = require('./pages/category');
 
 // middlewares
 const isAdmin = require('./middleware/isAdmin');
@@ -38,6 +39,7 @@ app.use('/auth', authRoutes);
 
 app.use('/', homeRoutes);
 app.use('/products', productsRoutes);
+app.use('/category', categoryRoutes);
 app.use('/cart', checkAuth, cartRoutes);
 app.use('/admin', isAdmin, adminRoutes);
 

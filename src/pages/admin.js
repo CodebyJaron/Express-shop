@@ -37,6 +37,7 @@ router.get('/', async function (req, res) {
 router.get('/products', async function (req, res) {
     res.render('admin/products/list', {
         user: req.user,
+        products: Product.getAll(),
     });
 });
 

@@ -68,21 +68,22 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <% products.forEach((product, index) => { %>
                                     <tr>
                                         <td
                                             class="whitespace-nowrap border-b border-gray-700 py-4 pl-4 pr-3 text-sm font-medium text-gray-100 sm:pl-6 lg:pl-8"
                                         >
-                                            <code>1</code>
+                                            <code><%= index + 1 %></code>
                                         </td>
                                         <td
                                             class="whitespace-nowrap border-b border-gray-700 hidden px-3 py-4 text-sm text-gray-400 sm:table-cell"
                                         >
-                                            Cool
+                                            <%= product.name %>
                                         </td>
                                         <td
                                             class="whitespace-nowrap border-b border-gray-700 px-3 py-4 text-sm text-gray-400"
                                         >
-                                            $5
+                                            <%= product.price %>
                                         </td>
                                         <td
                                             class="relative whitespace-nowrap border-b border-gray-700 py-4 pr-4 pl-3 text-right text-sm font-medium sm:pr-8 lg:pr-8"
@@ -92,6 +93,7 @@
                                             >
                                         </td>
                                     </tr>
+                                    <% }); %>
                                 </tbody>
                             </table>
                         </div>
