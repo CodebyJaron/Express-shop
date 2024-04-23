@@ -3,6 +3,7 @@ const app = express();
 
 const session = require('express-session');
 const passport = require('passport');
+const methodOverride = require('method-override');
 
 const authRoutes = require('./pages/auth');
 const homeRoutes = require('./pages/home');
@@ -17,6 +18,17 @@ const checkAuth = require('./middleware/checkAuth');
 
 app.set('view engine', 'ejs');
 app.set('views', './src/views');
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(
+    methodOverride(function (req, res) {
+        if (req.body && typeof req.body === 'object' && '_method' in req.body) {
+            var method = req.body._method;
+            delete req.body._method;
+            return method;
+        }
+    })
+);
 
 app.use(
     session({

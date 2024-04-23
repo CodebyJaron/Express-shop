@@ -1,0 +1,79 @@
+<head>
+    <%- include('../../partials/_header.ejs') %>
+</head>
+
+<link rel="preconnect" href="https://rsms.me/" />
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+<form action="/products" method="post" enctype="multipart/form-data">
+    <div class="antialiased bg-black w-full min-h-screen text-slate-300 relative py-4">
+        <div class="grid grid-cols-12 gap-2 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-8 max-w-8xl mr-4 my-2 px-2">
+            <%- include('../partials/sidebar') %>
+
+            <div id="content" class="bg-white/10 col-span-9 rounded-lg p-6">
+                <div class="grid grid-cols-1 mt-5 mx-7">
+                    <label class="uppercase text-xs text-gray-500 text-light font-semibold">Product name</label>
+                    <input
+                        name="name"
+                        id="name"
+                        class="py-2 px-3 rounded-lg border-2 border-gray-600 mt-1 focus:outline-none focus:ring-2 focus:border-transparent bg-gray-800 text-white"
+                        type="text"
+                        placeholder="My cool product"
+                    />
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8 mt-5 mx-7">
+                    <div class="grid grid-cols-1">
+                        <label class="uppercase text-xs text-gray-500 text-light font-semibold">Product price</label>
+                        <input
+                            name="price"
+                            id="price"
+                            class="py-2 px-3 rounded-lg border-2 border-gray-600 mt-1 focus:outline-none focus:ring-2 focus:border-transparent bg-gray-800 text-white"
+                            type="text"
+                            placeholder="5.5"
+                        />
+                    </div>
+                    <div class="grid grid-cols-1">
+                        <label class="uppercase text-xs text-gray-500 text-light font-semibold">Category</label>
+                        <select
+                            name="categoryId"
+                            id="categoryId"
+                            class="py-2 px-3 rounded-lg border-2 border-gray-600 mt-1 focus:outline-none focus:ring-2 focus:border-transparent bg-gray-800 text-white"
+                        >
+                            <% categories.forEach(category => { %>
+                            <option value="<%= category.id %>"><%= category.name %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 mt-5 mx-7">
+                    <label class="uppercase text-xs text-gray-500 text-light font-semibold">Product images</label>
+                    <input
+                        name="images"
+                        id="images"
+                        class="py-2 px-3 rounded-lg border-2 border-gray-600 mt-1 focus:outline-none focus:ring-2 focus:border-transparent bg-gray-800 text-white"
+                        type="file"
+                        multiple
+                    />
+                </div>
+
+                <div class="grid grid-cols-1 mt-5 mx-7">
+                    <label class="uppercase text-xs text-gray-500 text-light font-semibold">Product description</label>
+                    <textarea
+                        name="description"
+                        id="description"
+                        class="py-2 px-3 rounded-lg border-2 border-gray-600 mt-1 focus:outline-none focus:ring-2 focus:border-transparent bg-gray-800 text-white"
+                        type="text"
+                        placeholder="Description"
+                    ></textarea>
+                </div>
+
+                <div class="flex justify-end mt-8">
+                    <button type="submit" class="px-5 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                        Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

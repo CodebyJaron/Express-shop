@@ -18,14 +18,13 @@
                 </div>
 
                 <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6">
+                    <% products.forEach((product) => { %>
                     <div
                         class="hover:scale-105 transition ease-in-out duration-300 w-full max-w-sm bg-black mx-auto rounded-md shadow-md overflow-hidden"
                     >
                         <div
                             class="flex items-end justify-end h-56 w-full bg-cover"
-                            style="
-                                background-image: url('https://images.unsplash.com/photo-1495856458515-0637185db551?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80');
-                            "
+                            style="background-image: url('<%= product.images[0] %>')"
                         >
                             <button
                                 class="p-2 rounded-full bg-green-600 text-white mx-5 -mb-4 hover:bg-green-500 focus:outline-none focus:bg-green-500"
@@ -46,10 +45,11 @@
                             </button>
                         </div>
                         <div class="px-5 py-3">
-                            <h3 class="text-white uppercase">Classic watch</h3>
-                            <span class="text-gray-500 mt-2">$123</span>
+                            <h3 class="text-white uppercase"><%= product.name %></h3>
+                            <span class="text-gray-500 mt-2">$<%= product.price %></span>
                         </div>
                     </div>
+                    <% }); %>
                 </div>
                 <!-- <div class="flex justify-center">
                     <div class="flex rounded-md mt-8">

@@ -69,7 +69,16 @@
                             /></svg
                         >0 items
                     </button>
-                    <a id="profileLink" href="<%= user ? '/profile' : '/auth/discord' %>" class="cursor-pointer">
+                    <% if (user) { %>
+                    <a id="profileLink" href="/profile" class="cursor-pointer">
+                        <img
+                            src="https://cdn.discordapp.com/avatars/<%= user.discordId %>/<%= user.avatar %>.png"
+                            alt="Profile Picture"
+                            class="w-12 h-12 rounded-full border border-gray-400 hover:border-white"
+                        />
+                    </a>
+                    <% } else { %>
+                    <a id="profileLink" href="/auth/discord" class="cursor-pointer">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -85,6 +94,7 @@
                             />
                         </svg>
                     </a>
+                    <% } %>
                 </div>
             </div>
         </nav>

@@ -6,10 +6,12 @@ const isAdmin = require('../middleware/isAdmin');
 router.post('/', isAdmin, async (req, res) => {
     try {
         const { name } = req.body;
+
         const category = new Category(null, name);
         await category.create();
-        res.redirect('/categories');
+        res.redirect(req.headers.referer);
     } catch (error) {
+        console.log(error);
         res.status(500).send('Error creating category');
     }
 });
@@ -20,7 +22,7 @@ router.put('/:id', isAdmin, async (req, res) => {
         const { name } = req.body;
         const category = new Category(id, name);
         await category.update();
-        res.redirect('/categories');
+        res.redirect(req.headers.referer);
     } catch (error) {
         res.status(500).send('Error updating category');
     }
@@ -31,8 +33,9 @@ router.delete('/:id', isAdmin, async (req, res) => {
         const { id } = req.params;
         const category = new Category(id);
         await category.delete();
-        res.redirect('/categories');
+        res.redirect(req.headers.referer);
     } catch (error) {
+        console.log(error);
         res.status(500).send('Error deleting category');
     }
 });

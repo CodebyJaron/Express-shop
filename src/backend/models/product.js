@@ -11,6 +11,19 @@ class Product {
         this.categoryId = categoryId;
     }
 
+    async addImage(imageUrl) {
+        this.images.push(imageUrl);
+        await this.updateImages();
+    }
+
+    async removeImage(imageUrl) {
+        const index = this.images.indexOf(imageUrl);
+        if (index !== -1) {
+            this.images.splice(index, 1);
+            await this.updateImages();
+        }
+    }
+
     static async getAll() {
         return new Promise((resolve, reject) => {
             db.query(`SELECT * FROM ${tables.PRODUCT}`, (err, rows) => {
@@ -45,7 +58,7 @@ class Product {
         return new Promise((resolve, reject) => {
             db.query(
                 `INSERT INTO ${tables.PRODUCT} (name, images, description, price, category_id) VALUES (?, ?, ?, ?, ?)`,
-                [this.name, this.images, this.description, this.price, this.categoryId],
+                [this.name, JSON.stringify(this.images), this.description, this.price, this.categoryId],
                 (err, result) => {
                     if (err) {
                         reject(err);
@@ -62,7 +75,7 @@ class Product {
         return new Promise((resolve, reject) => {
             db.query(
                 `UPDATE ${tables.PRODUCT} SET name = ?, images = ?, description = ?, price = ?, category_id = ? WHERE id = ?`,
-                [this.name, this.images, this.description, this.price, this.categoryId, this.id],
+                [this.name, JSON.stringify(this.images), this.description, this.price, this.categoryId, this.id],
                 (err, result) => {
                     if (err) {
                         reject(err);
@@ -95,6 +108,22 @@ class Product {
                     resolve(rows.map((row) => new Product(row.id, row.name, row.images, row.description, row.price)));
                 }
             });
+        });
+    }
+
+    async updateImages() {
+        return new Promise((resolve, reject) => {
+            db.query(
+                `UPDATE ${tables.PRODUCT} SET images = ? WHERE id = ?`,
+                [JSON.stringify(this.images), this.id],
+                (err, result) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(true);
+                    }
+                }
+            );
         });
     }
 }

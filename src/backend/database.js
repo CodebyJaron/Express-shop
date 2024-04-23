@@ -16,6 +16,7 @@ const tables = {
     CART_ITEMS: 'cart_items',
     ORDER_PRODUCTS: 'order_products',
     CATEGORY: 'category',
+    PRODUCT_IMAGE: 'product_image',
 };
 
 const createTable = (query) => {
@@ -50,7 +51,6 @@ const createTablesSequentially = async () => {
         await createTable(`CREATE TABLE IF NOT EXISTS \`${tables.PRODUCT}\` (
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255),
-            images VARCHAR(255),
             description VARCHAR(255),
             price VARCHAR(255),
             category_id INT,

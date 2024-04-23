@@ -5,6 +5,7 @@ const isAdmin = require('../middleware/isAdmin');
 const Product = require('../backend/models/product');
 const Order = require('../backend/models/orders');
 const User = require('../backend/models/user');
+const Category = require('../backend/models/category');
 
 router.get('/', async function (req, res) {
     try {
@@ -37,8 +38,49 @@ router.get('/', async function (req, res) {
 router.get('/products', async function (req, res) {
     res.render('admin/products/list', {
         user: req.user,
-        products: Product.getAll(),
+        products: await Product.getAll(),
     });
+});
+
+router.get('/products/create', isAdmin, async (req, res) => {
+    res.render('admin/products/form', {
+        user: req.user,
+        categories: await Category.getAll(),
+    });
+});
+
+// categories
+router.get('/categories', isAdmin, async (req, res) => {
+    res.render('admin/categories/list', {
+        user: req.user,
+        categories: await Category.getAll(),
+    });
+});
+
+router.get('/categories/create', isAdmin, async (req, res) => {
+    res.render('admin/categories/form', {
+        user: req.user,
+    });
+});
+
+router.get('/categories/edit/:id', isAdmin, async (req, res) => {
+    try {
+        const categoryId = req.params.id;
+        const category = await Category.findById(categoryId);
+
+        if (!category) {
+            return res.status(404).send('Category not found');
+        }
+        console.log(category);
+
+        res.render('admin/categories/form', {
+            user: req.user,
+            category: category,
+        });
+    } catch (error) {
+        console.error('Error fetching category:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 module.exports = router;
